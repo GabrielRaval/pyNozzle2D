@@ -1,14 +1,13 @@
-"""
-Created on Mon Oct  8 18:10:59 2018
+"""Created on Mon Oct  8 18:10:59 2018.
 
-@author: Gabriel Raval, 2018/19
+Author: `Gabriel Raval <https://github.com/GabrielRaval/pyNozzle2D>`_, 2018/19
 
 This file contains a set of functions for running a 2D planar CFD simulation
 for inviscid nozzle flows using the MacCormack technique.
 Edit the lines at the bottom under ###SETUP to change the simulation
 parameters.
 
-Designed for use with the Spyder IDE (https://www.spyder-ide.org) and
+Designed for use with the `Spyder IDE <https://www.spyder-ide.org>`_ and
 Python 3.7. Enable the outline pane for quick navigation.
 """
 
@@ -21,40 +20,59 @@ from matplotlib import pyplot as plt
 def IDstring(nx, ny, i, C, Cx, Cy, pb):
     """Return a list of strings used to identify figures.
 
-    Arguments:
-        nx -- Number of x coordinates. (int)\n
-        ny -- Number of y coordinates. (int)\n
-        i -- Latest iteration number. (int)\n
-        C -- Courant number. (float)\n
-        Cx -- Amount of artificial viscosity in x direction. (float)\n
-        Cy -- Amount of artificial viscosity in y direction. (float)\n
-        pb -- Back pressure. (float)\n
-    """
+    Parameters
+    ----------
+    nx : int
+        Number of x coordinates.
+    ny : int
+        Number of y coordinates.
+    i : int
+        Latest iteration number.
+    C : float
+        Courant number.
+    Cx : float
+        Amount of artificial viscosity in x direction.
+    Cy : float
+        Amount of artificial viscosity in y direction.
+    pb : float
+        Back pressure.
 
-    IDs = ['$n_x$=%i' % nx,
-           '$n_y$=%i' % ny,
-           '$n_t$=%i' % i,
-           'C=%s' % f'{C:.2f}',
-           '$C_x$=%s' % f'{Cx:.2f}',
-           '$C_y$=%s' % f'{Cy:.2f}',
-           '$p_b$=%s' % f'{pb:.1f}'
-           ]
+    Returns
+    -------
+    IDs : list
+        List of formatted strings corresponding to the input parameters.
+    """
+    IDs = [f'$n_x$={nx}',
+           f'$n_y$={ny}',
+           f'$n_t$={i}',
+           f'C={C:.2f}',
+           f'$C_x$={Cx:.2f}',
+           f'$C_y$={Cy:.2f}',
+           f'$p_b$={pb:.1f}']
 
     return IDs
 
 
 def plot_mach(OUTPUT, GRID, ID):
-    """Return a plot of the nozzle Mach number profile.
-
-    Arguments:
-        OUTPUT -- Arrays of data returned by the maccormack function or one of\
-                  the ic_* functions. (tuple)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        ID -- String to add below plot title. (str)
     """
+    Return a plot of the nozzle Mach number profile.
 
+    Parameters
+    ----------
+    OUTPUT : tuple
+        Arrays of data returned by the maccormack function or one of the ic_*\
+            functions.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     """Extract grid data"""
     xis, etas, nx, ny, xs, ys, y_x = GRID
     rho, T, u, v, U = OUTPUT
@@ -70,7 +88,7 @@ def plot_mach(OUTPUT, GRID, ID):
     plt.plot(xs[0, :], M[0, :], 'r', label='Centerline', linewidth=1.5)
     plt.plot(xs[0, :], M[-1, :], 'k', label='Wall', linewidth=1.5)
 
-    plt.title("Mach number profile\n%s" % ID)
+    plt.title(f"Mach number profile\n{ID}")
     plt.xlabel('$x/y_t$')
     plt.xlim(-0.5, xs[0, -1]+0.5)
     plt.xticks(np.linspace(0, int(xs[0, -1]), int(xs[0, -1])+1))
@@ -84,17 +102,25 @@ def plot_mach(OUTPUT, GRID, ID):
 
 
 def plot_pressure(OUTPUT, GRID, ID):
-    """Return a plot of the nozzle pressure profile.
-
-    Arguments:
-        OUTPUT -- Arrays of data returned by the maccormack function or one of\
-                  the ic_* functions. (tuple)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        ID -- String to add below plot title. (str)
     """
+    Return a plot of the nozzle pressure profile.
 
+    Parameters
+    ----------
+    OUTPUT : tuple
+        Arrays of data returned by the maccormack function or one of the ic_*\
+            functions.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     xis, etas, nx, ny, xs, ys, y_x = GRID
     rho, T, u, v, U = OUTPUT
     p = rho*T
@@ -107,7 +133,7 @@ def plot_pressure(OUTPUT, GRID, ID):
     plt.plot(xs[0, :], p[0, :], 'r', label='Centerline', linewidth=1.5)
     plt.plot(xs[0, :], p[-1, :], 'k', label='Wall', linewidth=1.5)
 
-    plt.title("Pressure profile\n%s" % ID)
+    plt.title(f'Pressure profile\n{ID}')
     plt.ylabel('p', rotation='horizontal')
     plt.xlabel('$x/y_t$')
     plt.ylim(0, 1)
@@ -117,23 +143,30 @@ def plot_pressure(OUTPUT, GRID, ID):
 
 
 def plot_mach_time(Ms, i, ID):
-    """Return a plot of the outlet centerline Mach number varying over time.
+    """
+    Return a plot of the outlet centerline Mach number varying over time.\
     Reaches a reasonably steady state much sooner than the residuals.
 
-    Arguments:
-        Ms -- array of length nt containing outlet Mach numbers over time\
-              (numpy.ndarray)
+    Parameters
+    ----------
+    Ms : numpy.ndarray
+        array of length nt containing outlet Mach numbers over time.
+    i : int
+        latest iteration number.
+    ID : str
+        String to add below plot title.
 
-        i -- latest iteration number. (int)
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
 
-        ID -- String to add below plot title. (str)
     """
-
     ts = np.arange(i)  # Plot upto latest iteration 'i'
     f = plt.figure()
     plt.plot(ts, Ms[:i, 0])
 
-    plt.title('Outlet centerline Mach number over time\n %s' % ID)
+    plt.title(f'Outlet centerline Mach number over time\n{ID}')
     plt.ylabel('M', rotation='horizontal')
     plt.xlabel('nt')
 
@@ -141,17 +174,25 @@ def plot_mach_time(Ms, i, ID):
 
 
 def plot_mach_out(OUTPUT, ys, ID):
-    """Return a plot of the Mach number profile across the nozzle outlet.
-
-    Arguments:
-        OUTPUT -- Arrays of data returned by the maccormack function or one of\
-                  the ic_* functions. (tuple)
-
-        ys -- Array of y coordinates for every grid point. (numpy.ndarray)
-
-        ID -- String to add below plot title. (str)
     """
+    Return a plot of the Mach number profile across the nozzle outlet.
 
+    Parameters
+    ----------
+    OUTPUT : tuple
+        Arrays of data returned by the maccormack function or one of the ic_*\
+            functions.
+    ys : numpy.ndarray
+        Array of y coordinates for every grid point.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     """Extract data"""
     rho, T, u, v, U = OUTPUT
     V = (u**2+v**2)**0.5
@@ -162,7 +203,7 @@ def plot_mach_out(OUTPUT, ys, ID):
     plt.plot(ys[:, -1], M[:, -1])
 
     """Format plot"""
-    plt.title("Outlet Mach number profile\n%s" % ID)
+    plt.title(f'Outlet Mach number profile\n{ID}')
     plt.ylabel('M             ', rotation='horizontal')
     plt.ylim(min(M[:, -1]-0.1), max(M[:, -1])+0.1)
     plt.xlabel('$y/y_t$')
@@ -172,17 +213,24 @@ def plot_mach_out(OUTPUT, ys, ID):
 
 
 def plot_res(RES, i, ID):
-    """Returns a plot of the residuals in the style of ANSYS Fluent.
-
-    Arguments:
-        RES -- Array returned by RUN function containing residuals for each\
-               iteration. (numpy.ndarray)
-
-        i -- Latest iteration number. (int)
-
-        ID -- String to add below plot title. (str)
     """
+    Return a plot of the residuals in the style of ANSYS Fluent.
 
+    Parameters
+    ----------
+    RES : numpy.ndarray
+        Array returned by RUN function containing residuals for each iteration.
+    i : int
+        Latest iteration number.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     ts = np.arange(i)  # Plot upto latest iteration 'i'
     f = plt.figure()
 
@@ -193,21 +241,29 @@ def plot_res(RES, i, ID):
 
     plt.yscale('log')
     plt.legend(frameon=False)
-    plt.title("Residuals\n%s" % ID)
+    plt.title('Residuals\n{ID}')
     plt.xlabel("nt")
 
     return plt.show(f)
 
 
 def plot_grid(GRID, ID):
-    """Plots the physical and computational grids.
-
-    Arguments:
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        ID -- String to add below plot title. (str)
     """
+    Plot the physical and computational grids.
 
+    Parameters
+    ----------
+    GRID : Tuple
+        Arrays of data returned by one of the grid_* functions.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     """Extract grid data"""
     xis, etas, nx, ny, xs, ys = GRID[:-1]
     yw = ys[-1]
@@ -231,7 +287,7 @@ def plot_grid(GRID, ID):
     plt.ylim(-0.5, etas[-1, 0]+0.5)
     plt.xticks(ticks=np.arange(0, np.ceil(xis[0, -1]), 5))
     plt.yticks(ticks=np.arange(0, np.ceil(etas[-1, -1]), 5))
-    plt.title('Computational grid\n%s' % ID)
+    plt.title(f'Computational grid\n{ID}')
 
     """PHYSICAL GRID"""
     f2 = plt.figure(figsize=(scale, scale))
@@ -254,23 +310,30 @@ def plot_grid(GRID, ID):
     plt.yticks(ticks=np.arange(0, np.ceil(ys[-1, -1]+1), 1))
     plt.xlim(-0.5, xs[0, -1]+0.5)
     plt.ylim(-0.5, ys[-1, -1]+0.5)
-    plt.title('Physical grid\n%s' % ID)
+    plt.title(f'Physical grid\n{ID}')
 
     return plt.show(f2)
 
 
 def contour_mach(OUTPUT, GRID, ID):
-    """Plots a 2D contour plot of Mach number.
-
-    Arguments:
-        OUTPUT -- Arrays of data returned by the maccormack function or one of\
-                  the ic_* functions. (tuple)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        ID -- String to add below plot title. (str)
     """
+    Plot a 2D contour plot of Mach number.
 
+    Parameters
+    ----------
+    OUTPUT : tuple
+        Arrays of data returned by the maccormack function or one of the ic_*\
+            functions.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    None.
+
+    """
     """Extract data"""
     rho, T, u, v, U = OUTPUT
     xis, etas, nx, ny, xs, ys, y_x = GRID
@@ -284,9 +347,9 @@ def contour_mach(OUTPUT, GRID, ID):
     f = plt.figure(figsize=(13, 6))
 
     plt.contourf(xs, ys, M, z1, cmap='jet')
-#    plt.contourf(xs, -ys, M, z1, cmap='jet')  # Show lower half of nozzle
+    # plt.contourf(xs, -ys, M, z1, cmap='jet')  # Show lower half of nozzle
 
-#    plt.contour(xs, ys, M, np.linspace(2.5, 3, 5), colors='k')
+    # plt.contour(xs, ys, M, np.linspace(2.5, 3, 5), colors='k')
 
     try:  # Skip if colorbar fails due to zero gradient
         plt.colorbar(ticks=z2)
@@ -295,29 +358,37 @@ def contour_mach(OUTPUT, GRID, ID):
 
     """Format plot"""
     plt.axis('scaled')
-    plt.title("Mach number\n%s" % ID)
+    plt.title(f'Mach number\n{ID}')
     plt.xlabel('$x/y_t$')
     plt.xlim(-0.5, xs[0, -1]+0.5)
     plt.xticks(np.linspace(0, int(xs[0, -1]), int(xs[0, -1])+1))
     plt.ylabel('$y/y_t$        ', rotation='horizontal')
     plt.ylim(-0.5, ys[-1, -1]+0.5)
-#    plt.ylim(-ys[-1, -1]-0.5, ys[-1, -1]+0.5)
+    # plt.ylim(-ys[-1, -1]-0.5, ys[-1, -1]+0.5)
 
     return plt.show(f)
 
 
 def contour_pressure(OUTPUT, GRID, ID):
-    """Plots a 2D contour plot of pressure.
-
-    Arguments:
-        OUTPUT -- Arrays of data returned by the maccormack function or one of\
-                  the ic_* functions. (tuple)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        ID -- String to add below plot title. (str)
     """
+    Plot a 2D contour plot of pressure.
 
+    Parameters
+    ----------
+    OUTPUT : tuple
+        Arrays of data returned by the maccormack function or one of the ic_*\
+            functions.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     rho, T, u, v, U = OUTPUT
     xis, etas, nx, ny, xs, ys, y_x = GRID
     p = rho*T
@@ -331,7 +402,7 @@ def contour_pressure(OUTPUT, GRID, ID):
 
     plt.colorbar(ticks=z2)
     plt.axis('scaled')
-    plt.title("Pressure\n%s" % ID)
+    plt.title('Pressure\n{ID}')
     plt.xlabel('$x/y_t$')
     plt.xlim(-0.5, xs[0, -1]+0.5)
     plt.xticks(np.linspace(0, int(xs[0, -1]), int(xs[0, -1])+1))
@@ -342,17 +413,24 @@ def contour_pressure(OUTPUT, GRID, ID):
 
 
 def contour_C(OUTPUT, GRID, ID):
-    """Contour plot of Mach lines.
-
-    Arguments:
-        OUTPUT -- Arrays of data returned by the maccormack function or one of\
-                  the ic_* functions. (tuple)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        ID -- String to add below plot title. (str)
     """
+    Contour plot of Mach lines.
 
+    Parameters
+    ----------
+    OUTPUT : tuple
+        Arrays of data returned by the maccormack function or one of the ic_*\
+            functions.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    ID : str
+        String to add below plot title.
+
+    Returns
+    -------
+    None.
+
+    """
     """Extract data"""
     g = 1.4
     rho, T, u, v, U = OUTPUT
@@ -360,8 +438,7 @@ def contour_C(OUTPUT, GRID, ID):
     V = (u**2 + v**2)**0.5
     M = V/T**0.5
 
-
-#    for q in np.arange(ny)[:-1]:
+    # for q in np.arange(ny)[:-1]:
     q = 0
     # Only plot on columns where M > 1
     w = np.where(np.all(M[q:] > 1, 0))[0]
@@ -386,7 +463,7 @@ def contour_C(OUTPUT, GRID, ID):
 
     """Format plot"""
     plt.axis('scaled')
-    plt.title("Mach lines\n%s" % ID)
+    plt.title(f'Mach lines\n{ID}')
 
     plt.xlabel('$x/y_t$')
     plt.xlim(-0.5, xs[0, -1]+0.5)
@@ -402,20 +479,27 @@ def contour_C(OUTPUT, GRID, ID):
 
 
 def diff(y, x, a, GRID):
-    """Numerically differentiate arrays in vector y with respect to x
-
-    Arguments:
-        y -- List of 2D arrays in xi-eta space to differentiate.\
-             (numpy.ndarray)
-
-        x -- Differentiate with respect to 'xi' or 'eta'. (str)
-
-        a -- Use 'f' for forward differences, 'r' for rearward differences or\
-             'c' for central differences. (str)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
     """
+    Numerically differentiate arrays in vector y with respect to x.
 
+    Parameters
+    ----------
+    y : numpy.ndarray
+        List of 2D arrays in xi-eta space to differentiate.
+    x : str
+        Differentiate with respect to 'xi' or 'eta'.
+    a : str
+        Use 'f' for forward differences, 'r' for rearward differences or 'c'\
+            for central differences.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+
+    Returns
+    -------
+    dy_dx : numpy.ndarray
+        DESCRIPTION.
+
+    """
     """Extract grid data."""
     xis, etas, nx, ny = GRID[:4]
     dxi = xis.max()/(nx-1)
@@ -461,17 +545,40 @@ def diff(y, x, a, GRID):
 
 
 def grid_specified(nx, ny, xw, yw, stretch=(0, 0)):
-    """Returns a structured grid based on the wall contour specified by xw, yw.
-
-    Arguments:
-        nx -- Number of x coordinates. (int)\n
-        ny -- Number of y coordinates. (int)\n
-        xw -- List of wall x coordinates. (numpy.ndarray)\n
-        yw -- List of wall y coordinates. (numpy.ndarray)\n
-        stretch -- Tuple containing bx, by, floats for controlling stretch in\
-                    x and y direction respectively. (tuple)
     """
+    Return a structured grid based on the wall contour specified by xw, yw.
 
+    Parameters
+    ----------
+    nx : int
+        Number of x coordinates.
+    ny : int
+        Number of y coordinates.
+    xw : numpy.ndarray
+        List of wall x coordinates.
+    yw : numpy.ndarray
+        List of wall y coordinates.
+    stretch : tuple, optional
+        Tuple containing bx, by, floats for controlling stretch in x and y\
+            direction respectively. The default is (0, 0).
+
+    Returns
+    -------
+    xis : numpy.ndarray
+        Array of xi coordinates.
+    etas : numpy.ndarray
+        Array of eta coordinates.
+    nx : numpy.ndarray
+        Number of x coordinates.
+    ny : numpy.ndarray
+        Number of y coordinates.
+    xs : numpy.ndarray
+        Array of x coordinates.
+    ys : numpy.ndarray
+        Array of y coordinates.
+    y_x : numpy.ndarray
+        Array of dy/dx at each gridpoint.
+    """
     bx, by = stretch
 
     """Create arrays of computational grid points."""
@@ -508,22 +615,46 @@ def grid_specified(nx, ny, xw, yw, stretch=(0, 0)):
 
 
 def grid_extended(nx, ny, xw, yw, stretch=(0, 0, 0)):
-    """Returns a structured grid based on the wall contour specified by xw, yw,
+    """
+    Return a structured grid based on the wall contour specified by xw, yw,\
     adds a converging section to make a Laval nozzle.
 
-    Arguments:
-        nx -- Number of x coordinates. (int)\n
-        ny -- Number of y coordinates. (int)\n
-        xw -- List of wall x coordinates. (numpy.ndarray)\n
-        yw -- List of wall y coordinates. (numpy.ndarray)\n
-        stretch (tuple):
-            bxd -- Amount of stretch for diverging section in x direction.\
-                   (float)\n
-            bxc -- Amount of stretch for converging section in x direction.\
-                   (float)\n
-            by -- Amount of stretch in y direction. (float)
-    """
+    Parameters
+    ----------
+    nx : int
+        Number of x coordinates.
+    ny : int
+        Number of y coordinates.
+    xw : numpy.ndarray
+        List of wall x coordinates.
+    yw : numpy.ndarray
+        List of wall y coordinates.
+    stretch : tuple, optional
+        bxd : float
+            Amount of stretch for diverging section in x direction.
+        bxc : float
+            Amount of stretch for converging section in x direction.
+        by : float
+            Amount of stretch in y direction.
+        The default is (0, 0, 0).
 
+    Returns
+    -------
+    xis : numpy.ndarray
+        Array of xi coordinates.
+    etas : numpy.ndarray
+        Array of eta coordinates.
+    nx : numpy.ndarray
+        Number of x coordinates.
+    ny : numpy.ndarray
+        Number of y coordinates.
+    xs : numpy.ndarray
+        Array of x coordinates.
+    ys : numpy.ndarray
+        Array of y coordinates.
+    y_x : numpy.ndarray
+        Array of dy/dx at each gridpoint.
+    """
     bxd, bxc, by = stretch
 
     """Create empty arrays."""
@@ -535,7 +666,7 @@ def grid_extended(nx, ny, xw, yw, stretch=(0, 0, 0)):
     """Generate x coordinates."""
     L = xw[-1]  # Diverging section length
     xt = L/4  # Add converging section of length L/4
-#    i_t = round(nx/4)
+    # i_t = round(nx/4)
     w = abs(xt-np.linspace(0, L+xt, nx))
     i_t = np.where(w == np.min(w))[0][0]  # Array index of throat
     ux1 = np.linspace(0, 1, i_t, endpoint=False)  # [0, ..., 1] of length i_t
@@ -578,18 +709,43 @@ def grid_extended(nx, ny, xw, yw, stretch=(0, 0, 0)):
 
 
 def grid_parametric(nx, ny, Ar, L, stretch=(0, 0)):
-    """Generate a grid for a parametric wall contour.
-
-    Arguments:
-        nx -- Number of x coordinates. (int)\n
-        ny -- Number of y coordinates. (int)\n
-        Ar -- Exit area ratio Ae/At. (float)\n
-        L -- Nozzle length. (float)\n
-        stretch (tuple):
-            bx -- Amount of stretch in x direction. (float)\n
-            by -- Amount of stretch in y direction. (float)
     """
+    Generate a grid for a parametric wall contour.
 
+    Parameters
+    ----------
+    nx : int
+        Number of x coordinates.
+    ny : int
+        Number of y coordinates.
+    Ar : float
+        Exit area ratio Ae/At.
+    L : float
+        Nozzle length.
+    stretch : tuple, optional
+        bx : float
+            Amount of stretch in x direction.
+        by : float
+            Amount of stretch in y direction.
+        The default is (0, 0).
+
+    Returns
+    -------
+    xis : numpy.ndarray
+        Array of xi coordinates.
+    etas : numpy.ndarray
+        Array of eta coordinates.
+    nx : numpy.ndarray
+        Number of x coordinates.
+    ny : numpy.ndarray
+        Number of y coordinates.
+    xs : numpy.ndarray
+        Array of x coordinates.
+    ys : numpy.ndarray
+        Array of y coordinates.
+    y_x : numpy.ndarray
+        Array of dy/dx at each gridpoint.
+    """
     bx, by = stretch
 
     """Create arrays of xi and eta coordinates on the computational plane."""
@@ -635,20 +791,33 @@ def grid_parametric(nx, ny, Ar, L, stretch=(0, 0)):
 
 
 def ic_pb(GRID, pb, g=1.4):
-    """Calculate analytical quasi-1D conditions including shocks.
+    """
+    Calculate analytical quasi-1D conditions including shocks.
 
-    Returns the analytical quasi-1D solution vector calculated using isentropic
-    flow equations and shock jump relations. Uses the Brent method to solve
+    Return the analytical quasi-1D solution vector calculated using isentropic
+    flow equations and shock jump relations. Use the Brent method to solve
     nonlinear equations when necessary.
 
-    Arguments:
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
+    Parameters
+    ----------
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    pb : float
+        Back-pressure.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
 
-        g -- Ratio of specific heat capacities. (float)
+    Raises
+    ------
+    ValueError
+        Overexpanded.
 
-        pb -- Back-pressure. (float)
-"""
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
 
+    """
     """Flow data"""
     pb_p0 = pb  # Back pressure is dimensionless
 
@@ -672,11 +841,11 @@ def ic_pb(GRID, pb, g=1.4):
     i_t = np.where(A == At)[0].max()  # Throat location
 
     def F_Ar(M, g):
-        "Nozzle area A/A* as a function of Mach number."
+        """Nozzle area A/A* as a function of Mach number."""
         return 1/M*((1+(g-1)/2*M**2)/(1+(g-1)/2))**((g+1)/(2*g-2))
 
     def M_sub(Ar, g):
-        """Takes an area ratio A/A* and returns the corresponding subsonic Mach
+        """Take an area ratio A/A* and return the corresponding subsonic Mach\
         number using a variant of the Brent root finding method."""
         if np.any(Ar < 1):
             raise ValueError("A/A* must be greater than or equal to 1")
@@ -684,7 +853,7 @@ def ic_pb(GRID, pb, g=1.4):
             return opt.brenth(lambda M: F_Ar(M, g) - Ar, 10**-12, 1)
 
     def M_super(Ar, g):
-        """Takes an area ratio A/A* and returns the corresponding supersonic
+        """Take an area ratio A/A* and return the corresponding supersonic\
         Mach number using a variant of the Brent root finding method."""
         if np.any(Ar < 1):
             raise ValueError("A/A* must be greater than or equal to 1")
@@ -695,12 +864,12 @@ def ic_pb(GRID, pb, g=1.4):
                 raise ValueError("Invalid above Mach 5")
 
     def p_p0(M, g):
-        "Pressure p/p0 as a function of Mach number."
+        """Pressure p/p0 as a function of Mach number."""
         return (1 + (g-1)/2*M**2)**(-g/(g-1))
 
     def p02_p01(M, g):
-        """Total pressure ratio p02/p01 across a normal shock as a function of
-        Mach number M1 immediately before shock."""
+        """Total pressure ratio p02/p01 across a normal shock as a function\
+        of Mach number M1 immediately before shock."""
         ans = ((g+1)*M**2/((g-1)*M**2+2))**(g/(g-1))\
             * ((g+1)/(2*g*M**2-g+1))**(1/(g-1))
         return ans
@@ -739,12 +908,12 @@ def ic_pb(GRID, pb, g=1.4):
         "Either shock in nozzle or overexpanded."
         try:
             "Shock in nozzle"
-            f1 = lambda M: F_Ar(M, g)*p_p0(M, g) - pb_p0*Ar_e
+            def f1(M): return F_Ar(M, g)*p_p0(M, g) - pb_p0*Ar_e
             Me = opt.brenth(f1, Me_C, 1)  # Look for Me_C < Me < 1
 
             "Mach number M1 immediately before shock."
             pb_p02 = p_p0(Me, g)
-            f2 = lambda M: p02_p01(M, g) - pb_p0/pb_p02
+            def f2(M): return p02_p01(M, g) - pb_p0/pb_p02
             M1 = opt.brenth(f2, 1, Me_D)  # Look for 1 < M1 < Me_D
 
             "Mach number M2 immediately after shock."
@@ -796,29 +965,47 @@ def ic_pb(GRID, pb, g=1.4):
 
 
 def ic_des(GRID, g=1.4):
-    """Returns the isentropic quasi-1D solution using the ic_pb function.
-
-    Arguments:
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        g -- Ratio of specific heat capacities. (float)
     """
+    Return the isentropic quasi-1D solution using the ic_pb function.
 
+    Parameters
+    ----------
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     return ic_pb(GRID, 0, g)
 
 
 def timestep(GRID, u, v, T, C):
-    """Calculates the longest stable timestep for an isentropic flow.
-
-    Arguments:
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        u -- Velocities in x direction. (numpy.ndarray)\n
-        v -- Velocities in y direction. (numpy.ndarray)\n
-        T -- Temperatures. (numpy.ndarray)\n
-        C -- Courant number for scaling the timestep. Must be < 1. (float)
     """
+    Calculate the longest stable timestep for an isentropic flow.
 
+    Parameters
+    ----------
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    u : numpy.ndarray
+        Velocities in x direction.
+    v : numpy.ndarray
+        Velocities in y direction.
+    T : numpy.ndarray
+        Temperatures.
+    C : float
+        Courant number for scaling the timestep. Must be < 1.
+
+    Returns
+    -------
+    dt : float
+        Size of timestep to be used in the maccormack function.
+    """
     """Grid data"""
     xis, etas, nx, ny, xs, ys, y_x = GRID
 
@@ -836,12 +1023,25 @@ def timestep(GRID, u, v, T, C):
 
 
 def metrics(GRID):
-    """Calculates the inverse metrics for given grid data.
-
-    Arguments:
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
     """
+    Calculate the inverse metrics for given grid data.
 
+    Parameters
+    ----------
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+
+    Returns
+    -------
+    y_xi : numpy.ndarray
+        Array of floating point values for dy/dxi.
+    y_eta : numpy.ndarray
+        Array of floating point values for dy/deta.
+    x_xi : numpy.ndarray
+        Array of floating point values for dx/dxi.
+    x_eta : numpy.ndarray
+        Array of floating point values for dx/deta.
+    """
     """Grid data"""
     xis, etas, nx, ny, xs, ys = GRID[:-1]
 
@@ -855,17 +1055,25 @@ def metrics(GRID):
 
 
 def euler(U, GRID, g=1.4):
-    """Returns flux vectors for the Euler equations.
-
-    Arguments:
-        U -- Solution vector U or Up from the maccormack function.\
-             (numpy.ndarray)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        g -- Ratio of specific heat capacities. (float)
     """
+    Return flux vectors for the Euler equations.
 
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector U or Up from the maccormack function.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
+
+    Returns
+    -------
+    F : numpy.ndarray
+        Flux vector.
+    G : numpy.ndarray
+        Flux vector.
+    """
     """Grid data"""
     xis, etas, nx, ny, xs, ys, y_x = GRID
 
@@ -886,15 +1094,26 @@ def euler(U, GRID, g=1.4):
 
 
 def av(U, nx, ny):
-    """Returns artificial viscosity terms Sx, Sy.
-
-    Arguments:
-        U -- Solution vector U or Up from the maccormack function.\
-             (numpy.ndarray)\n
-        nx -- Number of x coordinates. (int)\n
-        ny -- Number of y coordinates. (int)
     """
+    Return artificial viscosity terms Sx, Sy.
 
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector U or Up from the maccormack function.
+    nx : int
+        Number of x coordinates.
+    ny : int
+        Number of y coordinates.
+
+    Returns
+    -------
+    Sx : numpy.ndarray
+        Artificial viscosity term.
+    Sy : numpy.ndarray
+        Artificial viscosity term.
+
+    """
     rho = U[0]
     u = U[1]/U[0]
     v = U[2]/U[0]
@@ -915,25 +1134,36 @@ def av(U, nx, ny):
 
 
 def maccormack(U, GRID, MET, C, Cx, Cy, pb, i, g=1.4):
-    """Executes one iteration of the MacCormack time marching method.
-
-    Arguments:
-        U -- Solution vector from the maccormack function or one of the ic_*\
-             functions. (numpy.ndarray)
-
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        MET -- Arrays of inverse metrics returned by the metrics function.\
-               (tuple)
-
-        C -- Courant number. (float)\n
-        Cx -- Amount of artificial viscosity in x direction. (float)\n
-        Cy -- Amount of artificial viscosity in y direction. (float)\n
-        pb -- Back pressure. (float)\n
-        i -- Current iteration number from RUN function. (int)\n
-        g -- Ratio of specific heat capacities. (float)
     """
+    Execute one iteration of the MacCormack time marching method.
 
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector from the maccormack function or one of the ic_*\
+            functions.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    MET : tuple
+        Arrays of inverse metrics returned by the metrics function.
+    C : float
+        Courant number.
+    Cx : float
+        Amount of artificial viscosity in x direction.
+    Cy : float
+        Amount of artificial viscosity in y direction.
+    pb : float
+        Back pressure.
+    i : int
+        Current iteration number from RUN function.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
+
+    Returns
+    -------
+    None.
+
+    """
     """Calculate timestep for the given CFL number."""
     u = U[1]/U[0]
     v = U[2]/U[0]
@@ -1024,22 +1254,30 @@ def maccormack(U, GRID, MET, C, Cx, Cy, pb, i, g=1.4):
     v = U[2]/U[0]
     V = (u**2 + v**2)**0.5
     T = (g**2-g)*(U[3]/rho - 0.5*V**2)
-#    print(1, np.max(abs()))
+    # print(1, np.max(abs()))
     return rho, T, u, v, U
 
 
 def bc_in_sonic(ny, g=1.4):
-    """Sonic inlet condition.
+    """
+    Sonic inlet condition.
 
     Uses isentropic flow relations to calculate temperature, velocity and
     density for a sonic nozzle inlet and returns the corresponding 4 by ny
-    U vector for the inlet.
+    U vector for the inlet
 
-    Arguments:
-        ny -- Number of y coordinates. (int)\n
-        g -- Ratio of specific heat capacities. (float)
+    Parameters
+    ----------
+    ny : int
+        Number of y coordinates.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
+
+    Returns
+    -------
+    U_in : numpy.ndarray
+        Solution vector for a sonic inlet.
     """
-
     """Define empty arrays."""
     U_in = np.zeros((4, ny))
     T_in, V_in, rho_in = np.zeros(ny), np.zeros(ny), np.zeros(ny)
@@ -1061,19 +1299,29 @@ def bc_in_sonic(ny, g=1.4):
 
 
 def bc_in_subsonic(U, ny, y_x, g=1.4):
-    """Floating inlet condition.
+    """
+    Floating inlet condition.
 
     Generates 4 by ny vector U at the inlet by extrapolating velocity and
     calculating temperature and density from isentropic flow relations.
 
-    Arguments:
-        U -- Solution vector from the maccormack function. (numpy.ndarray)\n
-        ny -- Number of y coordinates. (int)\n
-        y_x -- Gradient of y coordinates in x direction. (np.ndarray)\n
-        g -- Ratio of specific heat capacities. (float)
-    """
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector from the maccormack function.
+    ny : int
+        Number of y coordinates.
+    y_x : numpy.ndarray
+        Gradient of y coordinates in x direction.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
 
-#    alpha_in = np.arctan(y_x)[:, 0]  # Angle of eta-lines at inflow
+    Returns
+    -------
+    U_in : numpy.ndarray
+        Solution vector for an extrapolated subsonic inlet
+    """
+    # alpha_in = np.arctan(y_x)[:, 0]  # Angle of eta-lines at inflow
     alpha_in = 0  # Uncomment this to make inflow uniform
 
     U_in = np.zeros((4, ny))  # Define empty array
@@ -1094,19 +1342,29 @@ def bc_in_subsonic(U, ny, y_x, g=1.4):
 
 
 def bc_in_stagnant(U, ny, y_x, g=1.4):
-    """Stagnation inlet condition.
+    """
+    Stagnation inlet condition.
 
     Generates 4 by ny vector U at the inlet by extrapolating velocity and
     setting temperature and density to their stagnation values.
 
-    Arguments:
-        U -- Solution vector from the maccormack function. (numpy.ndarray)\n
-        ny -- Number of y coordinates. (int)\n
-        y_x -- Gradient of y coordinates in x direction. (np.ndarray)\n
-        g -- Ratio of specific heat capacities. (float)
-    """
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector from the maccormack function.
+    ny : int
+        Number of y coordinates.
+    y_x : numpy.ndarray
+        Gradient of y coordinates in x direction.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
 
-#    alpha_in = np.arctan(y_x)[:, 0]  # Angle of eta-lines at inflow
+    Returns
+    -------
+    U_in : numpy.ndarray
+        Solution vector for an inlet at the stagnation condition.
+    """
+    # alpha_in = np.arctan(y_x)[:, 0]  # Angle of eta-lines at inflow
     alpha_in = 0  # Uncomment this to make inflow uniform
 
     T_in = 1  # Stagnation value
@@ -1128,17 +1386,28 @@ def bc_in_stagnant(U, ny, y_x, g=1.4):
 
 
 def bc_out_pb(U, ny, y_x, pb, g=1.4):
-    """Outlet back-pressure pb is specified, the rest of the flow variables
-    are extrapolated.
-
-    Arguments:
-        U -- Solution vector from the maccormack function. (numpy.ndarray)\n
-        ny -- Number of y coordinates. (int)\n
-        y_x -- Gradient of y coordinates in x direction. (np.ndarray)\n
-        pb -- Back pressure. (float)\n
-        g -- Ratio of specific heat capacities. (float)
     """
+    Outlet back-pressure pb is specified, the rest of the flow variables are\
+    extrapolated.
 
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector from the maccormack function.
+    ny : int
+        Number of y coordinates.
+    y_x : numpy.ndarray
+        Gradient of y coordinates in x direction.
+    pb : float
+        Back-pressure
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
+
+    Returns
+    -------
+    U_o : numpy.ndarray
+        Solution vector for an outlet with specified pressure.
+    """
     U_o = np.zeros((4, ny))  # Define empty array
     U_o[:-1, :] = 2*U[:-1, :, -2] - U[:-1, :, -3]  # Extrapolate U1, U2 and U3
     rho_o = U_o[0, :]  # Density at outflow
@@ -1151,32 +1420,47 @@ def bc_out_pb(U, ny, y_x, pb, g=1.4):
 
 
 def bc_out_float(U):
-    """Floating outlet condition.
+    """
+    Floating outlet condition.
 
     Calculates U vector at the outlet by extrapolating from previous
     gridpoints. Returns a 4 by ny array.
 
-    Arguments:
-        U -- Solution vector from the maccormack function. (numpy.ndarray)
-    """
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector from the maccormack function.
 
+    Returns
+    -------
+    U_o : numpy.ndarray
+        Solution vector extrapolated from previous gridpoints.
+    """
     U_o = 2*U[:, :, -2] - U[:, :, -3]
 
     return U_o
 
 
 def bc_sym(U):
-    """Symmetry boundary condition.
+    """
+    Symmetry boundary condition.
 
     Takes the flow variables along the symmetry
     line to be equal to the adjacent gridpoints. Adjusts the flow velocity
     components so the flow is tangential to the symmetry line.
     Returns a 4 by nx array.
 
-    Arguments:
-        U -- Solution vector from the maccormack function. (numpy.ndarray)
-    """
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector from the maccormack function.
 
+    Returns
+    -------
+    numpy.ndarray
+        Solution vector adjusted to be tangent to the symmetry line.
+
+    """
     U[:, 0, :] = U[:, 1, :]  # Copy flow variables from adjacent gridpoints
     U_s = U[:, 0, :]
 
@@ -1193,17 +1477,26 @@ def bc_sym(U):
 
 
 def bc_wall(U, y_x):
-    """Inviscid wall boundary condition.
+    """
+    Inviscid wall boundary condition.
 
     Extrapolates flow variables along wall
     and adjusts velocity components so the flow is tangential to the wall.
     Returns a 4 by nx array.
 
-    Arguments:
-        U -- Solution vector from the maccormack function. (numpy.ndarray)\n
-        y_x -- Gradient of y coordinates in x direction. (np.ndarray)
-    """
+    Parameters
+    ----------
+    U : numpy.ndarray
+        Solution vector from the maccormack function.
+    y_x : numpy.ndarray
+        Gradient of y coordinates in x direction.
 
+    Returns
+    -------
+    U_w : numpy.ndarray
+        Solution vector adjusted to be tangent to the wall.
+
+    """
     U_w = 2*U[:, -2, :] - U[:, -3, :]  # Extrapolate U
     alpha_w = np.arctan(y_x)[-1, :]  # Angle of wall
     rho_w = U_w[0, :]  # Density at wall
@@ -1219,23 +1512,43 @@ def bc_wall(U, y_x):
 
 
 def RUN(nt, GRID, IC, BC, C, Cx, Cy, pb, g=1.4):
-    """Returns the results of nt iterations of the maccormack function,
-    stopping early if converged.
-
-    Arguments:
-        nt -- number of iterations to run. (int)\n
-        GRID -- Arrays of data returned by one of the grid_* functions. (tuple)
-
-        IC -- An ic_* initial condition function. (function)\n
-        BC -- A pair of bc_in_*/bc_out_* boundary condition functions.\
-              (tuple)\n
-        C -- Courant number for scaling the timestep. Must be < 1. (float)\n
-        Cx -- Amount of artificial viscosity in x direction. (float)\n
-        Cy -- Amount of artificial viscosity in y direction. (float)\n
-        pb -- Back pressure. (float)\n
-        g -- Ratio of specific heat capacities. (float)
     """
+    Return the results of nt iterations of the maccormack function, stopping\
+    early if converged.
 
+    Parameters
+    ----------
+    nt : int
+        number of iterations to run.
+    GRID : tuple
+        Arrays of data returned by one of the grid_* functions.
+    IC : function
+        An ic_* initial condition function.
+    BC : tuple
+        A pair of bc_in_*/bc_out_* boundary condition functions.
+    C : float
+        Courant number for scaling the timestep. Must be < 1.
+    Cx : float
+        Amount of artificial viscosity in x direction.
+    Cy : float
+        Amount of artificial viscosity in y direction.
+    pb : float
+        Back pressure.
+    g : float, optional
+        Ratio of specific heat capacities. The default is 1.4.
+
+    Returns
+    -------
+    OUTPUT : tuple
+        Arrays of data returned by the maccormack function or one of the ic_*\
+            functions.
+    Ms : numpy.ndarray
+        array of length nt containing outlet Mach numbers over time.
+    RES : numpy.ndarray
+        Array containing residuals for each iteration.
+    i : int
+        Latest iteration number.
+    """
     plt.close('all')
     """Load wall coordinates, generate physical and computational grids for
     given nx and ny."""
@@ -1278,7 +1591,7 @@ def RUN(nt, GRID, IC, BC, C, Cx, Cy, pb, g=1.4):
         try:
             OUTPUT = maccormack(U, GRID, MET, C, Cx, Cy, pb, i, g)
             rho, T, u, v, U = OUTPUT
-#            dt = timestep(GRID, u, v, T, C)
+            # dt = timestep(GRID, u, v, T, C)
             """Residual array at even timesteps is the absolute difference
             between current solution vector and the solution vector from the
             last even timestep."""
@@ -1332,11 +1645,11 @@ def RUN(nt, GRID, IC, BC, C, Cx, Cy, pb, g=1.4):
 ### SETUP
 """Set parameters"""
 g = 1.4  # Heat capacity ratio for gas
-nt = 0  # Number of iterations to run
-nx = 160 # Gridpoints in x direction
-ny = 10  # Gridpoints in y direction
-C = 0.01  # CFL number
-Cx = 0.005  # Artificial viscosity in x direction
+nt = 1  # Number of iterations to run
+nx = 90 # Gridpoints in x direction
+ny = 30  # Gridpoints in y direction
+C = 0.05  # CFL number
+Cx = 0.01  # Artificial viscosity in x direction
 Cy = 0.0  # Artificial viscosity in y direction
 
 """Set extra parameters"""
@@ -1347,8 +1660,8 @@ Lr = 100  # Length ratio L/yt for generic Laval nozzle
 xw, yw = np.load('MoCwall.npy')  # Load wall profile for specified_grid
 
 """Set initial condition type"""
-#IC = ic_des # Quasi-1D design condition
-IC = ic_pb  # Quasi-1D solution with shocks
+IC = ic_des # Quasi-1D design condition
+# IC = ic_pb  # Quasi-1D solution with shocks
 
 """Set grid stretching"""
 bx = 0  # x stretch
@@ -1362,17 +1675,17 @@ stretch1 = bxd, bxc, by
 stretch2 = bx, by
 
 """Set grid type"""
-#GRID = grid_extended(nx, ny, xw, yw, stretch1)  # Minimum length nozzle
-#GRID = grid_specified(nx, ny, xw, yw, stretch2)  # Minimum length nozzle
-GRID = grid_parametric(nx, ny, Ar, Lr, stretch2)  # Generic Laval nozzle
+# GRID = grid_extended(nx, ny, xw, yw, stretch1)  # Minimum length nozzle
+GRID = grid_specified(nx, ny, xw, yw, stretch2)  # Minimum length nozzle
+# GRID = grid_parametric(nx, ny, Ar, Lr, stretch2)  # Generic Laval nozzle
 
 """Set inlet and outlet boundary conditions."""
-#BC = bc_in_sonic, bc_out_float  # Minimum length diverging section
-#BC = bc_in_subsonic, bc_out_float  # Laval nozzle design condition
-#BC = bc_in_stagnant, bc_out_float  # Laval nozzle design condition
-BC = bc_in_subsonic, bc_out_pb  # Laval nozzle shock capturing
-#BC = bc_in_stagnant, bc_out_pb
-#BC = bc_in_sonic, bc_out_pb
+BC = bc_in_sonic, bc_out_float  # Minimum length diverging section
+# BC = bc_in_subsonic, bc_out_float  # Laval nozzle design condition
+# BC = bc_in_stagnant, bc_out_float  # Laval nozzle design condition
+# BC = bc_in_subsonic, bc_out_pb  # Laval nozzle shock capturing
+# BC = bc_in_stagnant, bc_out_pb
+# BC = bc_in_sonic, bc_out_pb
 
 """Run program"""
 OUTPUT, Ms, RES, i = RUN(nt, GRID, IC, BC, C, Cx, Cy, pb)
@@ -1389,12 +1702,12 @@ xis, etas, nx, ny, xs, ys, y_x = GRID
 """Create ID string for identifying figures."""
 IDs = IDstring(nx, ny, i+1, C, Cx, Cy, pb)  # Create list of strings for ID
 ID = '  '.join(IDs[:-1])  # don't show pb
-#ID = '  '.join(IDs[:2])  # Show nx, ny only
-#ID += '\n'
-#ID += '  $p_b$=%s' % f'{pb:.1f}'
-#ID += '  $\\beta_x$=%s  $\\beta_y$=%s' % (f'{bx:.1f}', f'{by:.1f}')
-#ID += '  $\\beta$$_x$$_c$=%s  $\\beta$$_x$$_d$=%s  $\\beta_y$=%s'\
-#    % (f'{bxc:.1f}', f'{bxd:.1f}', f'{by:.1f}')
+# ID = '  '.join(IDs[:2])  # Show nx, ny only
+# ID += '\n'
+ID += f'  $p_b$={pb:.1f}'
+# ID += '  $\\beta_x$=%s  $\\beta_y$=%s' % (f'{bx:.1f}', f'{by:.1f}')
+# ID += '  $\\beta$$_x$$_c$=%s  $\\beta$$_x$$_d$=%s  $\\beta_y$=%s'\
+#     % (f'{bxc:.1f}', f'{bxd:.1f}', f'{by:.1f}')
 
 """Uncomment desired result plots."""
 #plot_grid(GRID, ID)
@@ -1403,7 +1716,7 @@ ID = '  '.join(IDs[:-1])  # don't show pb
 contour_mach(OUTPUT, GRID, ID)
 ##contour_pressure(OUTPUT, GRID, ID)
 #plot_pressure(OUTPUT, GRID, ID)
-plot_mach(OUTPUT, GRID, ID)
+# plot_mach(OUTPUT, GRID, ID)
 #plot_mach_out(OUTPUT, ys, ID)
-plot_mach_time(Ms, i, ID)
-plot_res(RES, i, ID)
+# plot_mach_time(Ms, i, ID)
+# plot_res(RES, i, ID)
